@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Hello</title>
+    <script type="text/javascript" src="rangy-core.js"></script>
+    <script type="text/javascript" src="rangy-selectionsaverestore.js"></script>
+    <style type="text/css">
+        .code {
+            font-family: Consolas, sans-serif;
+            font-size: 12pt;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            border: 1px solid black;
+            padding: 2px;
+            resize: none;
+            width: 640px;
+            height: 360px;
+        }
+        .code:focus {     
+            outline: none;     
+        }
+        .textbox {
+            background: transparent;
+            color: rgba(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+
+<div id="show" class="code"><span style="color:red">12345</span>12345</div>
+<!--<textarea id="edit" class="code textbox"></textarea>-->
+
+<script type="text/javascript">
+
+window.setTimeout(function () {
+    var s = rangy.saveSelection();
+    var show = document.getElementById("show");
+    show.innerHTML = "1234512345";
+    rangy.restoreSelection(s);
+}, 5000)
+
+</script>
+
+</body>
+</html>
