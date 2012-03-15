@@ -2,8 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
     <title>Hello</title>
+    <script src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
     <script type="text/javascript" src="rangy-core.js"></script>
     <script type="text/javascript" src="rangy-selectionsaverestore.js"></script>
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/default.min.css">
     <style type="text/css">
         .code {
             font-family: Consolas, sans-serif;
@@ -28,17 +30,99 @@
 </head>
 <body>
 
-<div id="show" class="code"><span style="color:red">12345</span>12345</div>
+<pre id="editor" class="code" contenteditable="true">var a = 0;</pre>
 <!--<textarea id="edit" class="code textbox"></textarea>-->
 
 <script type="text/javascript">
 
-window.setTimeout(function () {
-    var s = rangy.saveSelection();
-    var show = document.getElementById("show");
-    show.innerHTML = "1234512345";
-    rangy.restoreSelection(s);
-}, 5000)
+window.setInterval(function () {
+    var editor = document.getElementById("editor");
+    var s = saveSelection(editor);
+    editor.innerHTML = hljs.highlight("javascript", editor.innerText).value;
+    restoreSelection(editor, s);
+}, 1000);
+
+function saveSelection(containerEl) {
+    var charIndex = 0, start = 0, end = 0, foundStart = false, stop = {};
+    var sel = rangy.getSelection(), range;
+
+    function traverseTextNodes(node, range) {
+        if (node.nodeType == 3) {
+            if (!foundStart && node == range.startContainer) {
+                start = charIndex + range.startOffset;
+                foundStart = true;
+            }
+            if (foundStart && node == range.endContainer) {
+                end = charIndex + range.endOffset;
+                throw stop;
+            }
+            charIndex += node.length;
+        } else {
+            for (var i = 0, len = node.childNodes.length; i < len; ++i) {
+                traverseTextNodes(node.childNodes[i], range);
+            }
+        }
+    }
+
+    if (sel.rangeCount) {
+        try {
+            traverseTextNodes(containerEl, sel.getRangeAt(0));
+        } catch (ex) {
+            if (ex != stop) {
+                throw ex;
+            }
+        }
+    }
+
+    return {
+        start: start,
+        end: end
+    };
+}
+
+function restoreSelection(containerEl, savedSel) {
+    var charIndex = 0, range = rangy.createRange(), foundStart = false, stop = {};
+    range.collapseToPoint(containerEl, 0);
+
+    function traverseTextNodes(node) {
+        if (node.nodeType == 3) {
+            var nextCharIndex = charIndex + node.length;
+            if (!foundStart && savedSel.start >= charIndex && savedSel.start <= nextCharIndex) {
+                range.setStart(node, savedSel.start - charIndex);
+                foundStart = true;
+            }
+            if (foundStart && savedSel.end >= charIndex && savedSel.end <= nextCharIndex) {
+                range.setEnd(node, savedSel.end - charIndex);
+                throw stop;
+            }
+            charIndex = nextCharIndex;
+        } else {
+            for (var i = 0, len = node.childNodes.length; i < len; ++i) {
+                traverseTextNodes(node.childNodes[i]);
+            }
+        }
+    }
+
+    try {
+        traverseTextNodes(containerEl);
+    } catch (ex) {
+        if (ex == stop) {
+            rangy.getSelection().setSingleRange(range);
+        } else {
+            throw ex;
+        }
+    }
+}
+
+function formatText() {
+    var el = document.getElementById('pad');
+    var savedSel = saveSelection(el);
+    el.innerHTML = el.innerHTML.replace(/(<([^>]+)>)/ig,"");
+    el.innerHTML = el.innerHTML.replace(/([0-9])/ig,"<font color='red'>$1</font>");
+
+    // Restore the original selection
+    restoreSelection(el, savedSel);
+}
 
 </script>
 
