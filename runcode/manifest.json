@@ -1,18 +1,10 @@
 {
-	"name": "My First Extension",
-	"version": "1.0",
-	"description": "The first extension that I made.",
-	"browser_action": {
-		"default_icon": "icon.png",
-		"popup": "popup.html"
-	},
-	"content_scripts": [
-		{
-			"matches": [ "http://*/*", "https://*/*" ]
-		}
-	],
-	"permissions": [
-		"tabs",
-		"http://api.flickr.com/"
-	]
+    "name": "Cloudy Code",
+    "version": "0.1",
+    "description": "Execute the selected code in the cloud.",
+    "browser_action": {
+        "default_icon": "icon.png",
+        "popup": "popup.html"
+    },
+    "permissions": [ "<all_urls>", "tabs" ]
 }
