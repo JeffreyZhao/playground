@@ -1,0 +1,38 @@
+<html>
+<head>
+
+<style>
+    html {
+        border: 1px solid black;
+    }
+    body {
+      min-width: 357px;
+      overflow-x:hidden;
+      border: 1px solid red;
+    }
+
+    img {
+      margin:5px;
+      border:2px solid black;
+      vertical-align:middle;
+      width:75px;
+      height:75px;
+    }
+</style>
+
+<script src="scripts/jquery-1.5.1.min.js"></script>
+<script src="scripts/jscex.bundle.min.js"></script>
+
+<script>
+    chrome.tabs.executeScript(null, {
+        code: "alert(window.location)"
+    });
+</script>
+
+</head>
+<body>
+
+abcdefg
+
+</body>
+</html>
