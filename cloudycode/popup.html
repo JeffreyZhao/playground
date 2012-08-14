@@ -3,27 +3,62 @@
 
 <style>
     body {
-        min-width: 357px;
-        overflow-x:hidden;
+        padding: 5px;
+        font-family: Arial, sans-serif;
     }
 
     .code {
+        border: 1px solid black;
+        margin-bottom: 5px;
+        padding: 5px;
         width: 640px;
         min-height: 120px;
         max-height: 360px;
         overflow: scroll;
+        font-size: 10pt;
+        font-family: Consolas, Manaco;
+        -webkit-box-sizing: border-box;
     }
-
 </style>
 
+<link rel="stylesheet" type="text/css" href="styles/github.css" />
+
+<script src="scripts/highlight.js"></script>
+<script src="scripts/highlight-languages.js"></script>
 <script src="scripts/jquery-1.5.1.min.js"></script>
 <script src="scripts/jscex.bundle.min.js"></script>
 
 <script>
+    var ideoneLanguages = {"1":"C++ (gcc-4.3.4)","2":"Pascal (gpc) (gpc 20070904)","3":"Perl (perl 5.12.1)","4":"Python (python 2.6.4)","5":"Fortran (gfortran-4.3.4)","6":"Whitespace (wspace 0.3)","7":"Ada (gnat-4.3.2)","8":"Ocaml (ocamlopt 3.10.2)","9":"Intercal (c-intercal 28.0-r1)","10":"Java (sun-jdk-1.6.0.17)","11":"C (gcc-4.3.4)","12":"Brainf**k (bff-1.0.3.1)","13":"Assembler (nasm-2.07)","14":"CLIPS (clips 6.24)","15":"Prolog (swi) (swipl 5.6.64)","16":"Icon (iconc 9.4.3)","17":"Ruby (ruby-1.9.2)","19":"Pike (pike 7.6.86)","21":"Haskell (ghc-6.8.2)","22":"Pascal (fpc) (fpc 2.2.0)","23":"Smalltalk (gst 3.1)","25":"Nice (nicec 0.9.6)","26":"Lua (luac 5.1.4)","27":"C# (mono-2.8)","28":"Bash (bash 4.0.35)","29":"PHP (php 5.2.11)","30":"Nemerle (ncc 0.9.3)","32":"Common Lisp (clisp) (clisp 2.47)","33":"Scheme (guile) (guile 1.8.5)","34":"C99 strict (gcc-4.3.4)","35":"JavaScript (rhino) (rhino-1.6.5)","36":"Erlang (erl-5.7.3)","38":"Tcl (tclsh 8.5.7)","39":"Scala (scala-2.8.0.final)","40":"SQL (sqlite3-3.7.3)","43":"Objective-C (gcc-4.5.1)","44":"C++0x (gcc-4.5.1)","45":"Assembler (gcc-4.3.4)","54":"Perl 6 (rakudo-2010.08)","62":"Text (text 6.10)","101":"VB.NET (mono-2.4.2.3)","102":"D (dmd) (dmd-2.042)","104":"AWK (gawk) (gawk-3.1.6)","105":"AWK (mawk) (mawk-1.3.3)","106":"COBOL 85 (tinycobol-0.65.9)","107":"Forth (gforth-0.7.0)","108":"Prolog (gnu) (gprolog-1.3.1)","110":"bc (bc-1.06.95)","111":"Clojure (clojure 1.1.0)","112":"JavaScript (spidermonkey) (spidermonkey-1.7)","114":"Go (gc-2010-07-14)","115":"Unlambda (unlambda-2.0.0)","116":"Python 3 (python-3.1.2)","117":"R (R-2.11.1)","118":"COBOL (open-cobol-1.0)","119":"Oz (mozart-1.4.0)","121":"Groovy (groovy-1.7)","122":"Nimrod (nimrod-0.8.8)","123":"Factor (factor-0.93)","124":"F# (fsharp-2.0.0)","125":"Falcon (falcon-0.9.6.6)"};
+
+    var hightlightLanguages = { "1": "cpp", "27": "cs", "112": "javascript", "21": "haskell", "4": "python", "116": "python", "17": "ruby" };
+
+    hljs.tabSpacing = "    ";
+
+    function start(code) {
+        if (!code) {
+            $("#divMessage").text("Please select a piece of code.");
+            return;
+        }
+
+        var sltLanguages = $("#sltLanguages");
+        $.each(ideoneLanguages, function (key, value) {
+            sltLanguages
+                .append($("<option></option>")
+                .attr("value", key)
+                .text(value));
+        });
+
+        // $("#code").text(code);
+        var highlighted = hljs.highlightAuto(code);
+        $("#code").html(highlighted.value);
+        $("#divMessage").text(highlighted.language)
+    }
+
     chrome.tabs.getSelected(null, function (tab) {
         chrome.tabs.executeScript(tab.id, { file: "scripts/page.js", allFrames: true }, function () {
             chrome.tabs.sendRequest(tab.id, { executeSelection: true }, function (response) {
-                $("pre").text(response.code);
+                start(response.code);
             });
         });
     });
@@ -32,7 +67,12 @@
 </head>
 <body>
 
-<pre id="code" class="code" style="font-size:12pt; font-family: Consolas, Manaco"></pre>
+<pre id="code" class="code"></pre>
+<textarea id="editor" class="code" style="display:none;"></textarea>
+
+<options id="sltLanguages"><option>
+
+<div id="divMessage"></div>
 
 </body>
 </html>
